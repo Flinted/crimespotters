@@ -5,21 +5,42 @@ var PieChart = function(crimeTypes){
   var chart = new Highcharts.Chart({
     chart: {
       type: "pie",
-      renderTo: container
+      renderTo: container,
+      backgroundColor: 'rgba(255, 255, 255, 0.75)',
+      style: {
+       fontFamily: 'Mononoki'
+     }
+   },
+   plotOptions: {
+    series: {
+      dataLabels: {
+        enabled: false
+      },
+      showInLegend: true,
+    }
     },
-
-    title: {
-      text: "Crimes by type within target area"
+     legend: {
+      align: 'left',
+      verticalAlign: 'bottom',
+      layout: 'vertical',
     },
+   title: {
+    text: "Crimes by type within target area"
+  },
+  credits: [
+  {
+    enabled:false
+  }
+  ],
+  series: [
+  {
+    name: "Type",
+    data: crimeTypes,
+    borderColor: "black",
+    borderWidth: 1
+  }
+  ]
 
-    series: [
-      {
-        name: "Type",
-        data: crimeTypes
-      }
-    ]
-
-  })
-    console.log(chart)
+})
 
 }

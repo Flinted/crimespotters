@@ -1,7 +1,7 @@
 var state = {
   crimes: [],
   latLng: {lat:51.499505,lng:-0.159673},
-  month: "2015-12",
+  month: "2015-01",
   markers: [],
   infoWindow: new google.maps.InfoWindow({
         content: ""
@@ -24,16 +24,29 @@ function main(){
   getCrimes(state.url);
   state.ran = true;
   state.map.bindclick(); 
-  mapDiv = document.getElementById("map")
+  var banner = document.getElementById("banner");
+  var selector = document.getElementById("selector");
+  selector.addEventListener('change', function(event){
+    state.month =this.value
+    state.url= "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"];
+    getCrimes()
+    })
+}
 
-  // window.setInterval(function(){
-  //   state.count ++
-  //   if(state.count % 2 === 0 ){
-  //     mapDiv.style.boxShadow = "0px -40px 100px red";
-  //   }else{
-  //     mapDiv.style.boxShadow = "0px -40px 100px blue";
-  //   }
-  // }, 500)
+function changed(event){
+  console.log(event.value)
+
+}
+
+function police(){
+  window.setInterval(function(){
+    state.count ++
+    if(state.count % 2 === 0 ){
+      banner.style.boxShadow = "5px -5px 20px red";
+    }else{
+      banner.style.boxShadow = "5px -5px 20px blue";
+    }
+  }, 500)
 }
 
 // gets all crimes for area
@@ -91,7 +104,6 @@ function createData(){
     {name:"violent-crime",y: 0},
     {name:"other-crime",y: 0}]
 
-  console.log("createdata")
   state.crimes.forEach(function(crime){
     crimeTypes.forEach(function(type){
       if(type.name === crime.category){type.y ++}
@@ -100,14 +112,18 @@ function createData(){
   var text = document.getElementById("text");
   text.innerHTML = "";
   var crimeInfo = document.createElement('h3')
-  crimeInfo.innerHTML = state.crimes.length + " crimes within 1 mile of <br>lat:" + state.latLng.lat + "<br>lng:" + state.latLng.lng 
+  var selectMonth = document.getElementById('selector').options[document.getElementById('selector').selectedIndex].text
+  crimeInfo.innerHTML = "In " + selectMonth + " there were:<br>" + state.crimes.length + " crimes within 1 mile of:<br>lat:" + state.latLng.lat + "<br>lng:" + state.latLng.lng 
   text.appendChild(crimeInfo)
   sortByKey(crimeTypes, 'y')
 
   crimeTypes.forEach(function(type){
     var p = document.createElement('p');
+    var textBox = document.createElement('div');
+    textBox.className ="textBox" ;
     p.innerHTML = type.y + " " + type.name;
-    text.appendChild(p);
+    textBox.appendChild(p);
+    text.appendChild(textBox);
   })
   new PieChart(crimeTypes);
 
@@ -115,11 +131,15 @@ function createData(){
 
 
 // creates map
-var Map = function(latLng, zoom){
+var Map = function(latLng, zoom, element){
   this.googleMap = new google.maps.Map(document.getElementById('map'), {
     center: latLng,
-    zoom: zoom
+    zoom: zoom,
+    zoomControlOptions: {
+            position: google.maps.ControlPosition.BOTTOM_CENTER
+        }
   });
+
   this.addMarker = function(latLng){
     var marker = new google.maps.Marker({
       position:  latLng,
@@ -144,7 +164,6 @@ var Map = function(latLng, zoom){
   // looks for clicks on map and recenters maps and initiates search for crimes.
   this.bindclick = function(){
     google.maps.event.addListener( this.googleMap, 'click', function(event){
-      console.log("clicked")
       for(marker of state.markers){
         marker.setMap(null);
       }
