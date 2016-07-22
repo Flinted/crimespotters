@@ -1,10 +1,49 @@
 body {
   background-color: wheat;
+  font-family: "Mononoki", sans-serif;
+  text-align: center;
 }
 
 #map{
   border: 2px solid black;
   height: 600px;
   width: 600px;
-  margin: auto;
+  float: right;
+  margin-right: 50px;
+  margin-top: 20px;
+  border-top-right-radius: 50%;
+  border-top-left-radius: 50%;
+}
+
+#text{
+  width: 500px;
+  height: 300px;
+  margin-top: 20px;
+  margin-left: 50px;
+  float: left;
+  box-shadow: 5px 5px 15px black;
+}
+
+#text p{
+  font-size: 0.5rem;
+}
+
+.textBox {
+  width: 140px;
+  height: 100px;
+  display: inline-block;
+  border: 1px solid black;
+  margin-right: 5px;
+}
+
+#title{
+  margin-bottom: 0;
+  margin-left: 50px;
+}
+
+#pieChart {
+
+  width: 450px;
+  height: 450px;
+  clear: right;
 }

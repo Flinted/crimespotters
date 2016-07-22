@@ -1,12 +1,44 @@
 var state = {
   crimes: [],
-  latLng: {lat:55.9486,lng:-3.1999},
+  latLng: {lat:51.499505,lng:-0.159673},
   month: "2015-12",
+  markers: [],
+  infoWindow: new google.maps.InfoWindow({
+        content: ""
+      }),
   url: "",
-  map: ""
+  map: "",
+  ran: false,
+  count: 1
+ };
+
+
+// ONLOAD==========================================================================
+window.onload = function(){
+  state.url= "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"];
+    main();
 }
 
+function main(){
+  state.map = new Map(state.latLng, 14);
+  getCrimes(state.url);
+  state.ran = true;
+  state.map.bindclick(); 
+  mapDiv = document.getElementById("map")
+
+  // window.setInterval(function(){
+  //   state.count ++
+  //   if(state.count % 2 === 0 ){
+  //     mapDiv.style.boxShadow = "0px -40px 100px red";
+  //   }else{
+  //     mapDiv.style.boxShadow = "0px -40px 100px blue";
+  //   }
+  // }, 500)
+}
+
+// gets all crimes for area
 var getCrimes = function(){
+  console.log("getCrimes")
   var request = new XMLHttpRequest();
   request.open("GET", state.url);
   request.setRequestHeader("X-Mashape-Key", "pG5UZT9xg6msh7gIsawwsJas5T6Ep1dKfgCjsnOGr51xw13ZGJ")
@@ -17,31 +49,70 @@ var getCrimes = function(){
     if (request.status === 200) {
       var jsonString = request.responseText;
       state.crimes = JSON.parse(jsonString);
-      main();
+      mapCrimes();
     }    
   }
 }
 
-window.onload = function(){
-  state.url= "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"]
-  getCrimes(state.url);
-}
 
-
-function main(){
-  console.log(state.crimes)
-  state.map = new Map(state.latLng, 16);
-  mapCrimes();
-}
-
+// places found crimes on to map
 function mapCrimes(){
+  console.log("mapCrimes")
   state.crimes.forEach(function(crime){
     var location = {lat: Number(crime.location.latitude), lng: Number(crime.location.longitude)}
-    var content = "crime here"
+    var outcome = crime.outcome_status|| "Not Known"
+    if (outcome != "Not Known"){outcome = outcome.category} 
+    var content = "Category: " + crime.category + "<br> Location: " + crime.location.street.name + "<br> Outcome: " + outcome
     state.map.addInfoWindow(location, content)
   })
+  createData();
+}
+
+function sortByKey(array, key) {
+    return array.sort(function(a, b) {
+        var x = b[key]; var y = a[key];
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
+  }
+
+function createData(){
+    var crimeTypes = [{name:"anti-social-behaviour", y: 0},
+    {name:"bicycle-theft",y: 0},
+    {name:"burglary",y: 0},
+    {name:"criminal-damage-arson",y: 0},
+    {name:"drugs",y: 0},
+    {name:"other-theft",y: 0},
+    {name:"possession-of-weapons",y: 0},
+    {name:"public-order",y: 0},
+    {name:"robbery",y: 0},
+    {name:"shoplifting",y: 0},
+    {name:"theft-from-the-person",y: 0},
+    {name:"vehicle-crime",y: 0},
+    {name:"violent-crime",y: 0},
+    {name:"other-crime",y: 0}]
+
+  console.log("createdata")
+  state.crimes.forEach(function(crime){
+    crimeTypes.forEach(function(type){
+      if(type.name === crime.category){type.y ++}
+    })  
+  })
+  var text = document.getElementById("text");
+  text.innerHTML = "";
+  var crimeInfo = document.createElement('h3')
+  crimeInfo.innerHTML = state.crimes.length + " crimes within 1 mile of <br>lat:" + state.latLng.lat + "<br>lng:" + state.latLng.lng 
+  text.appendChild(crimeInfo)
+  sortByKey(crimeTypes, 'y')
+
+  crimeTypes.forEach(function(type){
+    var p = document.createElement('p');
+    p.innerHTML = type.y + " " + type.name;
+    text.appendChild(p);
+  })
+  new PieChart(crimeTypes);
 
 }
+
 
 // creates map
 var Map = function(latLng, zoom){
@@ -52,20 +123,37 @@ var Map = function(latLng, zoom){
   this.addMarker = function(latLng){
     var marker = new google.maps.Marker({
       position:  latLng,
-      map: this.googleMap,
+      map: this.googleMap
     })
     return marker;   
   }; 
+
   // creates marker and info window
   this.addInfoWindow = function(latLng, content){
     var marker = this.addMarker(latLng);
+    state.markers.push(marker)
     marker.addListener('click', function(event){
+      state.infoWindow.close()
       var infoWindow = new google.maps.InfoWindow({
         content: content
       })
+      state.infoWindow = infoWindow
       infoWindow.open( this.map, marker ) 
     })
-}
+  };
+  // looks for clicks on map and recenters maps and initiates search for crimes.
+  this.bindclick = function(){
+    google.maps.event.addListener( this.googleMap, 'click', function(event){
+      console.log("clicked")
+      for(marker of state.markers){
+        marker.setMap(null);
+      }
+      state.latLng = {lat:event.latLng.lat(), lng: event.latLng.lng()}
+      state.map.googleMap.panTo(state.latLng);
+      state.url = "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"]
+      getCrimes();
+    }.bind(this))
+  };
 
 
 }
