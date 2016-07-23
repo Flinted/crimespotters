@@ -33,11 +33,6 @@ function main(){
     })
 }
 
-function changed(event){
-  console.log(event.value)
-
-}
-
 function police(){
   window.setInterval(function(){
     state.count ++
@@ -51,7 +46,6 @@ function police(){
 
 // gets all crimes for area
 var getCrimes = function(){
-  console.log("getCrimes")
   var request = new XMLHttpRequest();
   request.open("GET", state.url);
   request.setRequestHeader("X-Mashape-Key", "pG5UZT9xg6msh7gIsawwsJas5T6Ep1dKfgCjsnOGr51xw13ZGJ")
@@ -69,7 +63,8 @@ var getCrimes = function(){
 
 
 // places found crimes on to map
-function mapCrimes(){
+function mapCrimes(){  
+  var magnifier = document.getElementById("magnifier").style.display = 'block';
   console.log("mapCrimes")
   state.crimes.forEach(function(crime){
     var location = {lat: Number(crime.location.latitude), lng: Number(crime.location.longitude)}
@@ -78,7 +73,7 @@ function mapCrimes(){
     var content = "Category: " + crime.category + "<br> Location: " + crime.location.street.name + "<br> Outcome: " + outcome
     state.map.addInfoWindow(location, content)
   })
-  createData();
+  geoFind();
 }
 
 function sortByKey(array, key) {
@@ -88,7 +83,21 @@ function sortByKey(array, key) {
     });
   }
 
-function createData(){
+function geoFind(){
+      var url = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+state.latLng.lat+"," +state.latLng.lng+ "&sensor=false"
+      var request = new XMLHttpRequest();
+      request.open("GET", url);
+      request.onload = function () {
+          if (request.status === 200) {
+              var jsonString = request.responseText;
+              address = JSON.parse(jsonString);
+              createData(address.results[0].formatted_address)
+          }
+      }
+      request.send();
+  }
+function createData(address){
+    console.log(address)
     var crimeTypes = [{name:"anti-social-behaviour", y: 0},
     {name:"bicycle-theft",y: 0},
     {name:"burglary",y: 0},
@@ -113,7 +122,7 @@ function createData(){
   text.innerHTML = "";
   var crimeInfo = document.createElement('h3')
   var selectMonth = document.getElementById('selector').options[document.getElementById('selector').selectedIndex].text
-  crimeInfo.innerHTML = "In " + selectMonth + " there were:<br>" + state.crimes.length + " crimes within 1 mile of:<br>lat:" + state.latLng.lat + "<br>lng:" + state.latLng.lng 
+  crimeInfo.innerHTML = "In " + selectMonth + " there were:<br>" + state.crimes.length + " crimes within 1 mile of:<br>" + address
   text.appendChild(crimeInfo)
   sortByKey(crimeTypes, 'y')
 
@@ -125,8 +134,12 @@ function createData(){
     textBox.appendChild(p);
     text.appendChild(textBox);
   })
+  var common = document.createElement('h4');
+  var mostCommon = document.getElementById('mostCommon');
+  mostCommon.innerHTML="";
+  common.innerHTML = "Most Common Crime:<br> " + crimeTypes[0].name;
+  mostCommon.appendChild(common);
   new PieChart(crimeTypes);
-
 }
 
 
@@ -164,6 +177,7 @@ var Map = function(latLng, zoom, element){
   // looks for clicks on map and recenters maps and initiates search for crimes.
   this.bindclick = function(){
     google.maps.event.addListener( this.googleMap, 'click', function(event){
+      console.log(event)
       for(marker of state.markers){
         marker.setMap(null);
       }

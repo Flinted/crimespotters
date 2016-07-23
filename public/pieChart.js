@@ -6,7 +6,7 @@ var PieChart = function(crimeTypes){
     chart: {
       type: "pie",
       renderTo: container,
-      backgroundColor: 'rgba(255, 255, 255, 0.75)',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
       style: {
        fontFamily: 'Mononoki'
      }
