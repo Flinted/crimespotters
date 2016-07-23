@@ -124,3 +124,11 @@ body {
   text-align-last:center;
 
 }
+
+.highcharts-tooltip span {
+    height:auto !important;
+    width:150px !important;
+    overflow:auto !important;
+    white-space:normal !important; 
+    text-align: center;
+}

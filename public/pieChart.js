@@ -13,12 +13,14 @@ var PieChart = function(crimeTypes){
    },
    tooltip: {
     height: 100,
-    width: 100,
-    backgroundColor: "white",
+    pointFormat: '{point.percentage:.2f}%',
+    width: 300,
+    useHTML: true,
+    // backgroundColor: this.point.color,
     borderWidth: 3,
     borderColor: "black",
     positioner: function(){
-      return { x: 20, y: 30 };
+      return { x: 20, y: 34 };
     }
    },
 
