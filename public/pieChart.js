@@ -11,6 +11,17 @@ var PieChart = function(crimeTypes){
        fontFamily: 'Mononoki'
      }
    },
+   tooltip: {
+    height: 100,
+    width: 100,
+    backgroundColor: "white",
+    borderWidth: 3,
+    borderColor: "black",
+    positioner: function(){
+      return { x: 20, y: 30 };
+    }
+   },
+
    plotOptions: {
     series: {
       dataLabels: {
@@ -37,7 +48,7 @@ var PieChart = function(crimeTypes){
     name: "Type",
     data: crimeTypes,
     borderColor: "black",
-    borderWidth: 1
+    borderWidth: 1,
   }
   ]
 

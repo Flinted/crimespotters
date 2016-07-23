@@ -65,7 +65,6 @@ var getCrimes = function(){
 // places found crimes on to map
 function mapCrimes(){  
   var magnifier = document.getElementById("magnifier").style.display = 'block';
-  console.log("mapCrimes")
   state.crimes.forEach(function(crime){
     var location = {lat: Number(crime.location.latitude), lng: Number(crime.location.longitude)}
     var outcome = crime.outcome_status|| "Not Known"
@@ -97,7 +96,6 @@ function geoFind(){
       request.send();
   }
 function createData(address){
-    console.log(address)
     var crimeTypes = [{name:"anti-social-behaviour", y: 0},
     {name:"bicycle-theft",y: 0},
     {name:"burglary",y: 0},
