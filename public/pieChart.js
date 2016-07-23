@@ -16,7 +16,6 @@ var PieChart = function(crimeTypes){
     pointFormat: '{point.percentage:.2f}%',
     width: 300,
     useHTML: true,
-    // backgroundColor: this.point.color,
     borderWidth: 3,
     borderColor: "black",
     positioner: function(){

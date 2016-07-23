@@ -26,6 +26,7 @@ body {
  transform: rotate(270deg);
  margin-left: 210px;
  margin-top: -220px;
+ pointer-events: none;
 }
 
 #magnifier img{
@@ -82,17 +83,40 @@ body {
 
 #text p{
   padding-top: 8px;
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   margin:0px;
 }
 
 .textBox {
-  width: 140px;
-  height: 25px;
+  width: 155px;
+  height: 28px;
   display: inline-block;
   border: 1px solid black;
   margin-right: 5px;
   margin-bottom: 5px;
+}
+
+.textBox:hover{
+  box-shadow: 2px 2px 5px black;
+}
+
+#help img{
+  width: 50px;
+  height: 50px;
+  margin-top: 80px;
+  margin-left: 580px;
+  position: absolute;
+}
+
+#helpBox{
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  margin-top: 10px;
+  margin-left: 60px;
+  border-radius: 50%;
+  background-color: white;
+
 }
 
 #title{
