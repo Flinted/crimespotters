@@ -4,22 +4,23 @@ var state = {
   month: "2015-01",
   markers: [],
   infoWindow: new google.maps.InfoWindow({
-        content: ""
-      }),
+    content: ""
+  }),
   url: "",
   map: "",
   ran: false,
   count: 1
- };
+};
 
 
 // ONLOAD==========================================================================
 window.onload = function(){
   state.url= "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"];
-    main();
+  main();
 }
 
 function main(){
+
   state.map = new Map(state.latLng, 14);
   getCrimes(state.url);
   state.ran = true;
@@ -30,18 +31,29 @@ function main(){
     state.month =this.value
     state.url= "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"];
     getCrimes()
-    })
+  })
 }
 
+// turns on blues and twos
 function police(){
+  play()
+  var banner = document.getElementById("mostCommon");
   window.setInterval(function(){
+    if (state.count > 5){clearInterval(refreshID)}
     state.count ++
     if(state.count % 2 === 0 ){
-      banner.style.boxShadow = "5px -5px 20px red";
+      banner.style.boxShadow = "0px -5px 20px red";
+      banner.style.backgroundColor = "red";
     }else{
-      banner.style.boxShadow = "5px -5px 20px blue";
+      banner.style.boxShadow = "0px -5px 20px blue";
+      banner.style.backgroundColor = "blue";
     }
   }, 500)
+}
+
+function play(){
+     var audio = document.getElementById("audio");
+     audio.play();
 }
 
 // gets all crimes for area
@@ -69,47 +81,51 @@ function mapCrimes(){
     var location = {lat: Number(crime.location.latitude), lng: Number(crime.location.longitude)}
     var outcome = crime.outcome_status|| "Not Known"
     if (outcome != "Not Known"){outcome = outcome.category} 
-    var content = "Category: " + crime.category + "<br> Location: " + crime.location.street.name + "<br> Outcome: " + outcome
+      var content = "Category: " + crime.category + "<br> Location: " + crime.location.street.name + "<br> Outcome: " + outcome
     state.map.addInfoWindow(location, content)
   })
   geoFind();
 }
 
+// sorts crimes from largest to smallest 
 function sortByKey(array, key) {
-    return array.sort(function(a, b) {
-        var x = b[key]; var y = a[key];
-        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
-    });
-  }
+  return array.sort(function(a, b) {
+    var x = b[key]; var y = a[key];
+    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+  });
+}
 
+// returns street address
 function geoFind(){
-      var url = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+state.latLng.lat+"," +state.latLng.lng+ "&sensor=false"
-      var request = new XMLHttpRequest();
-      request.open("GET", url);
-      request.onload = function () {
-          if (request.status === 200) {
-              var jsonString = request.responseText;
-              address = JSON.parse(jsonString);
-              createData(address.results[0].formatted_address)
-          }
-      }
-      request.send();
+  var url = "http://maps.googleapis.com/maps/api/geocode/json?latlng="+state.latLng.lat+"," +state.latLng.lng+ "&sensor=false"
+  var request = new XMLHttpRequest();
+  request.open("GET", url);
+  request.onload = function () {
+    if (request.status === 200) {
+      var jsonString = request.responseText;
+      address = JSON.parse(jsonString);
+      createData(address.results[0].formatted_address)
+    }
   }
+  request.send();
+}
+
+// makes all page text other than HTML created, this is waaaay too long
 function createData(address){
-    var crimeTypes = [{name:"anti-social-behaviour", y: 0},
-    {name:"bicycle-theft",y: 0},
-    {name:"burglary",y: 0},
-    {name:"criminal-damage-arson",y: 0},
-    {name:"drugs",y: 0},
-    {name:"other-theft",y: 0},
-    {name:"possession-of-weapons",y: 0},
-    {name:"public-order",y: 0},
-    {name:"robbery",y: 0},
-    {name:"shoplifting",y: 0},
-    {name:"theft-from-the-person",y: 0},
-    {name:"vehicle-crime",y: 0},
-    {name:"violent-crime",y: 0},
-    {name:"other-crime",y: 0}]
+  var crimeTypes = [{name:"anti-social-behaviour", y: 0},
+  {name:"bicycle-theft",y: 0},
+  {name:"burglary",y: 0},
+  {name:"criminal-damage-arson",y: 0},
+  {name:"drugs",y: 0},
+  {name:"other-theft",y: 0},
+  {name:"possession-of-weapons",y: 0},
+  {name:"public-order",y: 0},
+  {name:"robbery",y: 0},
+  {name:"shoplifting",y: 0},
+  {name:"theft-from-the-person",y: 0},
+  {name:"vehicle-crime",y: 0},
+  {name:"violent-crime",y: 0},
+  {name:"other-crime",y: 0}]
 
   state.crimes.forEach(function(crime){
     crimeTypes.forEach(function(type){
@@ -135,6 +151,9 @@ function createData(address){
   var common = document.createElement('h4');
   var mostCommon = document.getElementById('mostCommon');
   mostCommon.innerHTML="";
+  mostCommon.addEventListener("click", function(){
+    police();
+  })
   common.innerHTML = "Most Common Crime:<br> " + crimeTypes[0].name;
   mostCommon.appendChild(common);
   new PieChart(crimeTypes);
@@ -147,10 +166,11 @@ var Map = function(latLng, zoom, element){
     center: latLng,
     zoom: zoom,
     zoomControlOptions: {
-            position: google.maps.ControlPosition.BOTTOM_CENTER
-        }
+      position: google.maps.ControlPosition.BOTTOM_CENTER
+    }
   });
 
+  // returns marker and adds to map
   this.addMarker = function(latLng){
     var marker = new google.maps.Marker({
       position:  latLng,
