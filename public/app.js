@@ -76,11 +76,9 @@ function goButton(event){
   }
 }
 
+// displays error box for 1 sec
 function invalid(){
-  // var p = document.createElement('p');
   var err = document.getElementById('error');
-  // p.innerHTML = "Those coordinates are not in the UK"
-  // err.appendChild(p);
   err.style.display = "inline";
   setTimeout(function(){
     err.style.display = "none"
@@ -179,6 +177,7 @@ function geoFind(){
   request.send();
 }
 
+// toggles help window
 function helpToggle(){
   var helper = document.getElementById("helpBox")
   console.log("change")
@@ -189,6 +188,7 @@ function helpToggle(){
   }
 }
 
+// tallies crimes by category for current selection and returns data
 function crimeCounter(){
   var crimeTypes= [{name:"anti-social-behaviour", y: 0, color:"#ffe0b3"},
   {name:"bicycle-theft",y: 0, color: "#ffebcc"},
@@ -223,6 +223,7 @@ function createData(address){
   new PieChart(crimeTypes);
 }
 
+// creates mostcommon data and attaches listener
 function mostCommon(crimeTypes){
   var common = document.createElement('h4');
   var mostCommon = document.getElementById('mostCommon');
@@ -234,6 +235,7 @@ function mostCommon(crimeTypes){
   mostCommon.appendChild(common);
 }
 
+// makes crime types boxes and attaches listeners
 function makeBoxes(crimeTypes){
   crimeTypes.forEach(function(type){
     var p = document.createElement('p');
@@ -259,6 +261,7 @@ function makeBoxes(crimeTypes){
   text.appendChild(textBox);
 }
 
+// makes text box header text
 function makeHeader(address){
   var text = document.getElementById("text");
   text.innerHTML = "";
@@ -268,7 +271,7 @@ function makeHeader(address){
   text.appendChild(crimeInfo);
 }
 
-// creates map
+// Map constructor here down===================================================================
 var Map = function(latLng, zoom, element){
   this.googleMap = new google.maps.Map(document.getElementById('map'), {
     center: latLng,
