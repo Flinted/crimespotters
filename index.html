@@ -47,11 +47,22 @@
  <option value="2014-03">March 2014</option> 
  <option value="2014-02">February 2014</option> 
  <option value="2014-01">January 2014</option> 
-
-
 </select>
+<form id="latLngSelect">
+  <input style="number" required id="lat" size= "5" placeholder= "lat(xx.xxx)">
+  <input style="number" required id="lng" size= "5" placeholder= "lng(xx.xxx)">
+  <input type="submit" id="goButton" value="Go Here!">
+</form>
+<div id="error" style="display:none"><p>Co-ordinates are not in the UK</p></div>
 </div>
-<div id="text"></div>
+<div id="text">
+<br>
+<br>
+<br>
+<br>
+<br>
+  <h1>Click anywhere in the magnifier to begin!</h1>
+</div>
 <div id="magnifier" style="display:none"><img src="magnifier.png"></div>
 <div id="map"></div>
 <div id="pieChart"></div>
@@ -62,11 +73,11 @@
 <br>
   <h2>Welcome to the CrimeSpotter</h2>
   <h4>Selecting an area:</h4>
-  <p>You can check a mile radius anywhere in England,<br> Wales or Northern Ireland by clicking on the Map.</p>
+  <p>You can check a mile radius anywhere in England,<br> Wales or Northern Ireland by clicking on the Map. <br>Or enter any UK latitude and longitude.</p>
   <h4>Dates:</h4>
   <p>The drop down to the left allows you to select a month to return crime data for.  If you change this it will return data for the currently selected location and any future selections.
   <h4>Filtering Crimes:</h4>
-  <p>Just click the category names in the info window to just display this kind of crime.</p>
+  <p>Just click the category names in the info window to <br>just display this kind of crime.</p>
   <h4>Markers:</h4>
   <p>You can click on markers for more information <br>on the crime that occured there.</p>
 

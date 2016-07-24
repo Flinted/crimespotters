@@ -1,6 +1,6 @@
 var state = {
   crimes: [],
-  latLng: {lat:53.9558,lng:-1.0799},
+  latLng: {lat:51.4700,lng:-0.4543},
   month: "2015-01",
   markers: [],
   infoWindow: new google.maps.InfoWindow({
@@ -37,19 +37,54 @@ window.onload = function(){
 function main(){
   state.map = new Map(state.latLng, 14);
   getCrimes(state.url);
-  state.ran = true;
+  var goForm = document.getElementById("latLngSelect")
+  goForm.onsubmit = function(event){
+    event.preventDefault();
+    goButton(event);
+  }
   state.map.bindclick(); 
   var help = document.getElementById("help");
   help.addEventListener("click",function(){
     console.log("clicked")
     helpToggle()
-})  
+  })  
   var selector = document.getElementById("selector");
   selector.addEventListener('change', function(event){
     state.month =this.value
     state.url= "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"];
-    getCrimes()
+    getCrimes();
   })
+}
+
+// goes to given latitude and longitude
+function goButton(event){
+  lat = event.target[0].value;
+  lng = event.target[1].value;
+  lat = Number(lat);
+  lng= Number(lng);
+  if(lat < 50||lat> 60 || lng < -3||lng > 6){
+    invalid()
+  }else{
+    state.latLng.lat = lat;
+    state.latLng.lng = lng;
+    for(marker of state.markers){
+      marker.setMap(null);
+    }
+    state.map.googleMap.panTo(state.latLng);
+    state.url = "https://stolenbikes88-datapoliceuk.p.mashape.com/crimes-street/all-crime?date="+state.month+"&lat="+state.latLng["lat"]+"&lng="+state.latLng["lng"]
+    getCrimes();
+  }
+}
+
+function invalid(){
+  // var p = document.createElement('p');
+  var err = document.getElementById('error');
+  // p.innerHTML = "Those coordinates are not in the UK"
+  // err.appendChild(p);
+  err.style.display = "inline";
+  setTimeout(function(){
+    err.style.display = "none"
+  },1000)
 }
 
 // turns on blues and twos
@@ -66,7 +101,7 @@ function police(){
       banner.style.backgroundColor = "blue";
     }
   }, 500)
-  play()
+  play();
 }
 
 function play(){
@@ -78,30 +113,34 @@ function play(){
 var getCrimes = function(){
   var request = new XMLHttpRequest();
   request.open("GET", state.url);
-  request.setRequestHeader("X-Mashape-Key", "pG5UZT9xg6msh7gIsawwsJas5T6Ep1dKfgCjsnOGr51xw13ZGJ")
-  request.setRequestHeader("Accept", "application/json")
+  request.setRequestHeader("X-Mashape-Key", "pG5UZT9xg6msh7gIsawwsJas5T6Ep1dKfgCjsnOGr51xw13ZGJ");
+  request.setRequestHeader("Accept", "application/json");
   request.send();
 
   request.onload = function () {
     if (request.status === 200) {
       var jsonString = request.responseText;
       state.crimes = JSON.parse(jsonString);
-      mapCrimes();
+      if (state.ran){
+        mapCrimes();
+      }
+      var magnifier = document.getElementById("magnifier").style.display = 'block';
+      
+      state.ran = true;
     }    
   }
 }
 
 // places found crimes on to map
 function mapCrimes(type){  
-  var magnifier = document.getElementById("magnifier").style.display = 'block';
 
   state.crimes.forEach(function(crime){
     if(type && crime.category != type){return;}
     var location = {lat: Number(crime.location.latitude), lng: Number(crime.location.longitude)}
-    var outcome = crime.outcome_status|| "Not Known"
+    var outcome = crime.outcome_status|| "Not Known";
     if (outcome != "Not Known"){outcome = outcome.category} 
-      var content = "Category: " + crime.category + "<br> Location: " + crime.location.street.name + "<br> Outcome: " + outcome
-    state.map.addInfoWindow(location, content)
+      var content = "Category: " + crime.category + "<br> Location: " + crime.location.street.name + "<br> Outcome: " + outcome;
+    state.map.addInfoWindow(location, content);
 
   })
   geoFind();
@@ -109,12 +148,12 @@ function mapCrimes(type){
 
 // shows just crimes by one category
 function filterCrimes(event){
-  var crimeCategory = event.target.innerText
+  var crimeCategory = event.target.innerText;
   crimeCategory = crimeCategory.replace(/^[\s\d]+/, '');
   for(marker of state.markers){
     marker.setMap(null);
   }
-  mapCrimes(crimeCategory)
+  mapCrimes(crimeCategory);
 }
 
 // sorts crimes from largest to smallest 
@@ -134,7 +173,7 @@ function geoFind(){
     if (request.status === 200) {
       var jsonString = request.responseText;
       address = JSON.parse(jsonString);
-      createData(address.results[0].formatted_address)
+      createData(address.results[0].formatted_address);
     }
   }
   request.send();
@@ -171,13 +210,13 @@ function crimeCounter(){
       if(type.name === crime.category){type.y ++}
     })  
   })
-  sortByKey(crimeTypes, 'y')
+  sortByKey(crimeTypes, 'y');
   return crimeTypes
 }
 
 // makes all page text other than HTML created, this is waaaay too long
 function createData(address){
-  var crimeTypes = crimeCounter()
+  var crimeTypes = crimeCounter();
   makeHeader(address);
   makeBoxes(crimeTypes);
   mostCommon(crimeTypes);
@@ -202,7 +241,7 @@ function makeBoxes(crimeTypes){
     textBox.className ="textBox" ;
     textBox.style.backgroundColor = state.colours[type.name]
     textBox.addEventListener('click',function(event){
-      filterCrimes(event)
+      filterCrimes(event);
     })
     p.innerHTML = type.y + " " + type.name;
     textBox.appendChild(p);
@@ -213,7 +252,7 @@ function makeBoxes(crimeTypes){
   textBox.className ="textBox" ;
   textBox.style.backgroundColor = "white"
   textBox.addEventListener('click',function(event){
-    mapCrimes()
+    mapCrimes();
   })
   p.innerHTML = "SHOW ALL CRIMES";
   textBox.appendChild(p);
@@ -223,10 +262,10 @@ function makeBoxes(crimeTypes){
 function makeHeader(address){
   var text = document.getElementById("text");
   text.innerHTML = "";
-  var crimeInfo = document.createElement('h3')
-  var selectMonth = document.getElementById('selector').options[document.getElementById('selector').selectedIndex].text
-  crimeInfo.innerHTML = "In " + selectMonth + " there were:<br>" + state.crimes.length + " crimes within 1 mile of:<br>" + address
-  text.appendChild(crimeInfo)
+  var crimeInfo = document.createElement('h3');
+  var selectMonth = document.getElementById('selector').options[document.getElementById('selector').selectedIndex].text;
+  crimeInfo.innerHTML = "In " + selectMonth + " there were:<br>" + state.crimes.length + " crimes within 1 mile of:<br>" + address;
+  text.appendChild(crimeInfo);
 }
 
 // creates map
@@ -273,6 +312,4 @@ var Map = function(latLng, zoom, element){
       getCrimes();
     }.bind(this))
   };
-
-
 }
