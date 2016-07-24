@@ -1,6 +1,6 @@
 var state = {
   crimes: [],
-  latLng: {lat:51.499505,lng:-0.159673},
+  latLng: {lat:53.9558,lng:-1.0799},
   month: "2015-01",
   markers: [],
   infoWindow: new google.maps.InfoWindow({
@@ -54,7 +54,6 @@ function main(){
 
 // turns on blues and twos
 function police(){
-  play()
   var banner = document.getElementById("mostCommon");
   window.setInterval(function(){
     if (state.count > 5){clearInterval(refreshID)}
@@ -67,6 +66,7 @@ function police(){
       banner.style.backgroundColor = "blue";
     }
   }, 500)
+  play()
 }
 
 function play(){
@@ -178,55 +178,21 @@ function crimeCounter(){
 // makes all page text other than HTML created, this is waaaay too long
 function createData(address){
   var crimeTypes = crimeCounter()
-  // var crimeTypes = [{name:"anti-social-behaviour", y: 0},
-  // {name:"bicycle-theft",y: 0},
-  // {name:"burglary",y: 0},
-  // {name:"criminal-damage-arson",y: 0},
-  // {name:"drugs",y: 0},
-  // {name:"other-theft",y: 0},
-  // {name:"possession-of-weapons",y: 0},
-  // {name:"public-order",y: 0},
-  // {name:"robbery",y: 0},
-  // {name:"shoplifting",y: 0},
-  // {name:"theft-from-the-person",y: 0},
-  // {name:"vehicle-crime",y: 0},
-  // {name:"violent-crime",y: 0},
-  // {name:"other-crime",y: 0}]
-
-  // state.crimes.forEach(function(crime){
-  //   crimeTypes.forEach(function(type){
-  //     if(type.name === crime.category){type.y ++}
-  //   })  
-  // })
-  // var text = document.getElementById("text");
-  // text.innerHTML = "";
-  // var crimeInfo = document.createElement('h3')
-  // var selectMonth = document.getElementById('selector').options[document.getElementById('selector').selectedIndex].text
-  // crimeInfo.innerHTML = "In " + selectMonth + " there were:<br>" + state.crimes.length + " crimes within 1 mile of:<br>" + address
-  // text.appendChild(crimeInfo)
-  // sortByKey(crimeTypes, 'y')
   makeHeader(address);
   makeBoxes(crimeTypes);
-  // crimeTypes.forEach(function(type){
-  //   var p = document.createElement('p');
-  //   var textBox = document.createElement('div');
-  //   textBox.className ="textBox" ;
-  //   textBox.addEventListener('click',function(event){
-  //     filterCrimes(event)
-  //   })
-  //   p.innerHTML = type.y + " " + type.name;
-  //   textBox.appendChild(p);
-  //   text.appendChild(textBox);
-  // })
-  // var common = document.createElement('h4');
-  // var mostCommon = document.getElementById('mostCommon');
-  // mostCommon.innerHTML="";
-  // mostCommon.addEventListener("click", function(){
-  //   police();
-  // })
-  // common.innerHTML = "Most Common Crime:<br> " + crimeTypes[0].name;
-  // mostCommon.appendChild(common);
+  mostCommon(crimeTypes);
   new PieChart(crimeTypes);
+}
+
+function mostCommon(crimeTypes){
+  var common = document.createElement('h4');
+  var mostCommon = document.getElementById('mostCommon');
+  mostCommon.innerHTML="";
+  mostCommon.addEventListener("click", function(){
+    police();
+  })
+  common.innerHTML = "Most Common Crime:<br> " + crimeTypes[0].name;
+  mostCommon.appendChild(common);
 }
 
 function makeBoxes(crimeTypes){
@@ -242,16 +208,17 @@ function makeBoxes(crimeTypes){
     textBox.appendChild(p);
     text.appendChild(textBox);
   })
-  var common = document.createElement('h4');
-  var mostCommon = document.getElementById('mostCommon');
-  mostCommon.innerHTML="";
-  mostCommon.addEventListener("click", function(){
-    police();
+  var p = document.createElement('p');
+  var textBox = document.createElement('div');
+  textBox.className ="textBox" ;
+  textBox.style.backgroundColor = "white"
+  textBox.addEventListener('click',function(event){
+    mapCrimes()
   })
-  common.innerHTML = "Most Common Crime:<br> " + crimeTypes[0].name;
-  mostCommon.appendChild(common);
+  p.innerHTML = "SHOW ALL CRIMES";
+  textBox.appendChild(p);
+  text.appendChild(textBox);
 }
-
 
 function makeHeader(address){
   var text = document.getElementById("text");
