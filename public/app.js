@@ -141,6 +141,7 @@ function mapCrimes(type){
     state.map.addInfoWindow(location, content);
 
   })
+  state.map.googleMap.setZoom(14);
   geoFind();
 }
 
